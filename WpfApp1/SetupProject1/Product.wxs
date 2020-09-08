@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <!-- old 1 : {3F82DC90-BF1F-4F26-B9F2-41BBB15E3412}-->
+  <!-- new 1 : {58A140EF-CFC6-4D26-B3E7-3B0ADB128F31}-->
+	<Product Id="{3F82DC90-BF1F-4F26-B9F2-41BBB15E3412}" Name="SetupProject1" Language="1033" Version="1.0.0.0" Manufacturer="TestCompany" UpgradeCode="dcbaedbf-2ede-48ef-be78-61372e2b4402">
+		<Package InstallerVersion="200" Compressed="yes"
+             InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" Cabinet="myapplication.cab" EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="SetupProject1" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+
+		</Feature>
+    
+      <!-- Step 2: Add the shortcut to your installer package -->
+			<DirectoryRef Id="ApplicationProgramsFolder">
+				<Component Id="ApplicationShortcut" Guid="{DB2EDB2D-BF7E-42E9-B96A-E9A6AC1CE765}">
+						<Shortcut Id="ApplicationStartMenuShortcut" 
+											Name="___Testing"
+											Description="My Application Description"
+											Target="[#EXEdestination]"	
+											WorkingDirectory="INSTALLFOLDER"/><!-- Target <- FileID, not component ID -->
+						<RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+						<RegistryValue Root="HKCU" Key="Software\MyCompany\MyApplicationName" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+				</Component>
+		</DirectoryRef>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="DesktopShortcut" Guid="{1FB1A253-3639-4468-A5C4-2DE544CB3967}" KeyPath="yes" Feature="ProductFeature">
+          <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="shortcutTest" Description="1111"
+										Target="[#EXEdestination]"	
+                    WorkingDirectory="INSTALLFOLDER"/>
+          <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+        </Component>
+			</Directory>
+      
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="SetupProject1" />
+			</Directory>
+
+      <!-- Step 1: Define the directory structure -->
+  		<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="__Testing Install"/>
+			</Directory>  
+
+
+		</Directory>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<UIRef Id="WixUI_InstallDir" />
+  
+  
+	</Fragment>
+
+	<Fragment>
+
+      <!--APPLICATIONROOTDIRECTORY? -->
+      <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+        <Component Id="EXEdestination" Guid="{9B7A7805-C4D9-4C44-B090-8919ABDC54C3}">
+          <!-- TODO: Insert files, registry keys, and other resources here. -->
+          <File Id="EXEdestination" Source="$(var.WpfApp1.TargetPath)" />	<!--must same componet ID?-->
+        </Component>
+      </ComponentGroup>
+
+	</Fragment>
+
+
+</Wix>
